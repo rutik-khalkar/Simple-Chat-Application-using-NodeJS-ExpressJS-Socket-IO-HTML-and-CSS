@@ -1,10 +1,9 @@
 const chatForm = document.getElementById('chat-form');
 const chatMessages = document.querySelector('.chat-messages');
+const roomName = document.getElementById('room-name');         
+const userList = document.getElementById('users');
 
 const socket = io();
-
-const roomName = document.getElementById('room-name');         
-const userList = document.getElementById('users');         
 
 const {username, room} = Qs.parse(location.search, {
     ignoreQueryPrefix : true
@@ -39,10 +38,17 @@ chatForm.addEventListener('submit', (e) => {
 function outputMessage(message) {
     const div = document.createElement('div');
     div.classList.add('message');
-    div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
-    <p class="text">
-        ${message.text}
-    </p>`;
+    div.innerHTML = `
+        <div class="newMeta">
+            <div class="userName"><b>${message.username}</b></div>
+            <div class="text-time>
+                <div class="text"> ${message.text}</div>
+                <div class="time">${message.time}</div>
+                <div class="date">${message.date}</div>
+            </div>
+        </div>
+   
+    `;
     document.querySelector('.chat-messages').appendChild(div);
 }
 
@@ -56,3 +62,13 @@ function outputUsers(users){
         ${users.map(user => `<li>${user.username}</li>`).join('')}
     `;
 }
+
+    // <p class="msg_name">
+    //     <b>${message.username}</b> </p>
+    //     <b>
+    //         <p class="text"> ${message.text}</p>
+    //     </b>
+    //     <p class="meta">
+    //         <span>${message.time}</span><br>
+    //         <span>${message.date}</span>
+    //     </p>

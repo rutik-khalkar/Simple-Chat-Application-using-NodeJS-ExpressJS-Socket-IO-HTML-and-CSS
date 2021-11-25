@@ -24,13 +24,13 @@ io.on('connection', socket => {
 
         socket.join(user.room);
         
-        socket.emit('message', formatMessage(joinName, 'Welcome To Riser Techub Chat'))
+        socket.emit('message', formatMessage(username, `Welcome To ${room} Chat Room`))
 
         socket.broadcast
             .to(user.room)
             .emit('message', 
             formatMessage(joinName, 
-                `${user.username} has joined the chat`
+                `${user.username} has joined the ${user.room} chat room!`
             ));
 
         io.to(user.room).emit('roomUsers', {
@@ -53,7 +53,7 @@ io.on('connection', socket => {
         if(user) {
             io.to(user.room)
             .emit('message', 
-            formatMessage(joinName,`${user.username} has left the chat!`));
+            formatMessage(joinName,`${user.username} has left the ${user.room} chat room!`));
 
             io.to(user.room).emit('roomUsers', {
                 room : user.room,

@@ -10,6 +10,7 @@
 	--dark-color-a: #c22e32;
 	--dark-color-b: #d0393e;
 	--light-color: #86bdf8;
+	--gray-color: #d6e9fc;
 	--success-color: #5cb85c;
 	--error-color: #d9534f;
 }
@@ -93,33 +94,74 @@ a {
 }
 
 .chat-messages {
-	padding: 30px;
-	max-height: 350px;
 	overflow-y: scroll;
+	max-height: 370px;
 }
 
 .chat-messages .message {
-	padding: 10px;
-	margin-bottom: 15px;
-	font-family:monospace;
-	background-color: var(--light-color);
+	background-color: #5cb85c;
 	border-radius: 5px;
-	/* text-align: right; */
+	margin: 10px;
+	padding: 5px;
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: column;
+}
+.chat-messages .message .userName {
+	font-size: large;
+}
 
+.chat-messages {
+	/* padding: 15px;
+	width: auto;
+	max-height: 350px;
+	overflow-y: scroll; */
+	/* overflow-y: auto; */
+}
+
+.chat-messages .message {
+	/* padding: 5px; */
+	/* width: auto;
+	margin-bottom: 10px;
+	background-color: var(--gray-color);
+	border-radius: 5px;
+	display: flex;
+	flex-direction: row; */
+}
+
+.chat-messages .message .text {
+	/* margin-left:20px;
+	color: #233f23; */
 }
 
 .chat-messages .message .meta {
-	font-size: 15px;
-	/* font-weight: bold; */
-	font-family: 'Courier New', Courier, monospace;
-	color: var(--dark-color-b);
-	opacity: 0.7;
+	/* font-size: 15px;
+	font-weight: bold; */
+	/* font-family: 'Courier New', Courier, monospace; */
+	/* color: var(--dark-color-b); */
+	/* opacity: 0.7;
 	margin-bottom: 7px;
+	margin-right: 10px;
+	text-align: right; */
+}
+.chat-messages .message .meta b {
+	/* font-size: 18px;
+	display: flex; */
+}
+
+.chat-messages .message .msg_name b {
+	/* font-size: 15px; */
+	/* font-family: 'Courier New', Courier, monospace; */
+	/* color: var(--dark-color-b);
+	color: #000;
+	margin: 10px;  */
 }
 
 .chat-messages .message .meta span {
 	/* color: rgb(0, 0, 0); */
-	color: #000;
+	/* color: blue;
+	font-size: 15px;
+	text-align: right; */
 }
 
 .chat-form-container {
@@ -136,11 +178,11 @@ a {
 	/* font-style: oblique; */
 	/* font-family: 'Courier New', Courier, monospace; */
 	padding: 5px;
-	margin-left: 175px;
+	margin-left: 250px;
 	margin-right: 5px;
 	height: 40px;
 	flex: 1;
-	border-radius: 10px;
+	border-radius: 5px;
 }
 
 /* Join Page */
