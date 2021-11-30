@@ -1,74 +1,69 @@
+const socket = io()
+
+const roomName = document.getElementById('roomName');
+const usersList = document.getElementById('users');
+const chatMessage = document.querySelector('.chat-messages');
 const chatForm = document.getElementById('chat-form');
-const chatMessages = document.querySelector('.chat-messages');
-const roomName = document.getElementById('room-name');         
-const userList = document.getElementById('users');
 
-const socket = io();
-
-const {username, room} = Qs.parse(location.search, {
+const { username, room } = Qs.parse(location.search, {
     ignoreQueryPrefix : true
 });
 
-socket.emit('joinRoom', {username, room});
+socket.emit('joinRoom', { username, room })
 
 socket.on('roomUsers', ({ room, users }) => {
+    console.log(room, users);
     outputRoomName(room);
-    outputUsers(users);
+    outputUsersName(users);
 });
 
-
-socket.on('message', message => {
+socket.on('message', (message, sts) => {
+    
     console.log(message);
-    outputMessage(message);
+    outputMessage(message, sts );
+    chatMessage.scrollTop = chatMessage.scrollHeight;
+});
 
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-})
+socket.on("welcome", (arg) => {
+    console.log(arg)
+});
 
 chatForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const msg = e.target.elements.msg.value;
-
-    socket.emit('chatMessage', msg)
+    socket.emit('chatMessage', msg);
 
     e.target.elements.msg.value = '';
     e.target.elements.msg.focus();
 });
-
-function outputMessage(message) {
+ 
+function outputMessage(message, status) {
+    if  ( status == undefined) {
+         status = ''
+    }
     const div = document.createElement('div');
     div.classList.add('message');
-    div.innerHTML = `
-        <div class="newMeta">
-            <div class="userName"><b>${message.username}</b></div>
-            <div class="text-time>
-                <div class="text"> ${message.text}</div>
-                <div class="time">${message.time}</div>
-                <div class="date">${message.date}</div>
+    div.innerHTML =`
+        <div class="newMeta" id="meta" 
+            <span class="userName"><b>${message.username}</b></span>
+            <div class="text-time">
+                <span class="text"> ${message.text}</span>
+                <span class="time">${message.time}</span>
+                <span class="date">${message.date}</span>
+                <span class="tick" id='change'>${status}</span>
+                
             </div>
-        </div>
-   
-    `;
+        </div>`;
     document.querySelector('.chat-messages').appendChild(div);
 }
 
-
-function outputRoomName(room){
+function outputRoomName (room) {
     roomName.innerHTML = room;
 }
 
-function outputUsers(users){
-    userList.innerHTML = `
-        ${users.map(user => `<li>${user.username}</li>`).join('')}
-    `;
+function outputUsersName (users) {
+   usersList.innerHTML = `
+    ${users.map(user => `<li>${user.username}</li>`).join('')}
+   `;
 }
-
-    // <p class="msg_name">
-    //     <b>${message.username}</b> </p>
-    //     <b>
-    //         <p class="text"> ${message.text}</p>
-    //     </b>
-    //     <p class="meta">
-    //         <span>${message.time}</span><br>
-    //         <span>${message.date}</span>
-    //     </p>
