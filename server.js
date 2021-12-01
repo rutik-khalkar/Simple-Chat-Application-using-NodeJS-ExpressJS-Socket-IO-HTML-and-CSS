@@ -3,6 +3,10 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const path = require('path');
+const bodyParser = require("body-parser");
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr('mySecretKey');
+const cors = require('cors');
 
 const socketio = require('socket.io');
 const io = socketio(server);
@@ -16,8 +20,17 @@ const {
 
 const  formatMessage = require('./utils/messages');
 
+
 //set static folder
 app.use(express.static(path.join(__dirname, 'public')));
+
+// for parsing application/json
+app.use(bodyParser.json());
+
+// for parsing application/xwww-
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cors({origin: '*'}))
 
 const joinName = 'Admin'
 
@@ -34,7 +47,7 @@ io.on('connection', socket => {
 
         socket.emit("message", 
             formatMessage(joinName, 
-                `${user.username} Welcome To ${room} Chat Room!`
+                cryptr.encrypt(`${user.username} Welcome To ${room} Chat Room!`)
             )
         )
 
@@ -42,7 +55,7 @@ io.on('connection', socket => {
             .to(user.room)
             .emit('message', 
                 formatMessage(joinName,
-                    `${user.username} has joined the ${user.room} Chat Room!`
+                    cryptr.encrypt(`${user.username} has joined the ${user.room} Chat Room!`)
                 )
             );
         
@@ -68,7 +81,7 @@ io.on('connection', socket => {
         if(user) {
             io.to(user.room)
             .emit('message',
-            formatMessage(joinName, `${user.username} has left the ${user.room} chat room!`)); 
+            formatMessage(joinName, cryptr.encrypt(`${user.username} has left the ${user.room} chat room!`))); 
 
             io.to(user.room).emit('roomUsers', {
                 room : user.room,
@@ -77,5 +90,18 @@ io.on('connection', socket => {
         }
     })
 });
+
+app.get("/decrypt", async (req, res) => {
+    message = req.query.message;
+    decrypted = cryptr.decrypt(message);
+    await res.json(decrypted);
+  });
+
+app.get('/encrypt', async (req, res) => {
+    message = req.query.message;
+    encrypted = cryptr.encrypt(message);
+    await res.json(encrypted);
+});
+
 
 server.listen(PORT, () => console.log(`Server running on port : ${PORT}...`))

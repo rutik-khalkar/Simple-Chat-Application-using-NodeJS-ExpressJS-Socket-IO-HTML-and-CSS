@@ -20,7 +20,20 @@ socket.on('roomUsers', ({ room, users }) => {
 socket.on('message', (message, sts) => {
     
     console.log(message);
-    outputMessage(message, sts );
+    url = "http://localhost:5000/decrypt?message=" + message.text ;
+    console.log("URL :" + url);
+    fetch(url)
+    .then((res) => res.json())
+    .then((decrypted) => {
+        console.log("Decrypted ", decrypted);
+        outputMessage({
+            username: message.username,
+            text: decrypted,
+            time: message.time,
+             date: message.date    
+        }, sts);
+    })
+    // outputMessage(message, sts)
     chatMessage.scrollTop = chatMessage.scrollHeight;
 });
 
@@ -28,11 +41,20 @@ socket.on("welcome", (arg) => {
     console.log(arg)
 });
 
-chatForm.addEventListener('submit', (e) => {
+chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const msg = e.target.elements.msg.value;
-    socket.emit('chatMessage', msg);
+
+    url =  "http://localhost:5000/encrypt?message=" + msg;
+    fetch(url)
+    .then((res) => res.json())
+    .then((encrypted) => {
+        socket.emit('chatMessage', encrypted);
+    })
+    .catch(rejected => {
+        console.log(rejected)
+    })
 
     e.target.elements.msg.value = '';
     e.target.elements.msg.focus();
