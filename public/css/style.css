@@ -3,7 +3,7 @@
     --main-color: #4c7acc;
     --dark-color-a: #c22e32;
 	--dark-color-b: #d0393e;
-	--light-color: #bbd7f5;
+	--light-color: #f1f7fd;
 	--gray-color: #dcecfc;
 	--success-color: #5cb85c;
 	--error-color: #d9534f;
@@ -22,11 +22,18 @@ body {
 	/* margin: 20px; */
 }
 
+#register{
+	margin-left: 50px;
+}
+
+#form{
+	margin: 10px;
+}
 
 .form-container{
     border: 1px solid gray;
     margin-top: 50px;
-    background-color: rgb(240, 250, 225);
+    background-color: rgb(240, 248, 227);
 }
 .display-4{
     font-weight: 200;

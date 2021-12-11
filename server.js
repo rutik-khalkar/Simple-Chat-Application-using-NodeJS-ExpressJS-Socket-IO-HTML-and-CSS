@@ -11,14 +11,19 @@ const cors = require('cors');
 const socketio = require('socket.io');
 const io = socketio(server);
 
+require('./config/database').connect();  //import database file 
+
 const PORT = 5000 || process.env.PORT;
 
 const { 
         userJoin, getRoomUsers, 
         userLeave, getCurrentUser,
-        getStatus } = require('./utils/users');
+        getStatus, getMessage, } = require('./utils/users');
 
 const  formatMessage = require('./utils/messages');
+const registerRoute = require('./registers');
+const validateRoute = require('./validate');
+const Messages = require('./models/messages');
 
 
 //set static folder
@@ -32,22 +37,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors({origin: '*'}))
 
+app.use('/register', registerRoute);
+app.use('/validate', validateRoute);
 const joinName = 'Admin'
+
 
 // Client Connection
 io.on('connection', socket => {
     console.log('A user connceted!');
 
     socket.on('joinRoom', ({ username, room }) => {
-       
-        const user = userJoin(socket.id, username, room);
 
+        const user = userJoin(socket.id, username, room);
+        console.log(socket.id)
         // Join the room
         socket.join(user.room)
-
+        
         socket.emit("message", 
             formatMessage(joinName, 
-                cryptr.encrypt(`${user.username} Welcome To ${room} Chat Room!`)
+               (`${user.username} Welcome To ${room} Chat Room!`)
             )
         )
 
@@ -55,10 +63,10 @@ io.on('connection', socket => {
             .to(user.room)
             .emit('message', 
                 formatMessage(joinName,
-                    cryptr.encrypt(`${user.username} has joined the ${user.room} Chat Room!`)
+                    (`${user.username} has joined the ${user.room} Chat Room!`)
                 )
             );
-        
+
         io.to(user.room).emit('roomUsers', {
             room : user.room,
             users : getRoomUsers(user.room)
@@ -67,7 +75,7 @@ io.on('connection', socket => {
         socket.on('chatMessage', (msg) => {
             const user = getCurrentUser(socket.id);
             const status = getStatus(room)
-        
+            const m = getMessage(msg, username, room)
             io.to(user.room).emit('message', formatMessage(user.username, msg), status);
            
         });
@@ -81,7 +89,7 @@ io.on('connection', socket => {
         if(user) {
             io.to(user.room)
             .emit('message',
-            formatMessage(joinName, cryptr.encrypt(`${user.username} has left the ${user.room} chat room!`))); 
+            formatMessage(joinName, (`${user.username} has left the ${user.room} chat room!`))); 
 
             io.to(user.room).emit('roomUsers', {
                 room : user.room,
@@ -91,17 +99,29 @@ io.on('connection', socket => {
     })
 });
 
-app.get("/decrypt", async (req, res) => {
-    message = req.query.message;
-    decrypted = cryptr.decrypt(message);
-    await res.json(decrypted);
-  });
-
-app.get('/encrypt', async (req, res) => {
-    message = req.query.message;
-    encrypted = cryptr.encrypt(message);
-    await res.json(encrypted);
+app.get('/dbMessage', async (req, res) => {
+    io.on('connection', socket => {
+        socket.on('joinRoom', async ({  room }) => {
+            Messages.find({room}).then(chat => {
+                res.json(chat);
+            });            
+        });
+    });
 });
+
+
+
+// app.get("/decrypt", async (req, res) => {
+//     message = req.query.message;
+//     decrypted = cryptr.decrypt(message);
+//     await res.json(decrypted);
+//   });
+
+// app.get('/encrypt', async (req, res) => {
+//     message = req.query.message;
+//     encrypted = cryptr.encrypt(message);
+//     await res.json(encrypted);
+// });
 
 
 server.listen(PORT, () => console.log(`Server running on port : ${PORT}...`))

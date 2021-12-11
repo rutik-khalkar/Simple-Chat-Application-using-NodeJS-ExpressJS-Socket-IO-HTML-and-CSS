@@ -1,9 +1,16 @@
 const users = [];
+const UserModel = require('../models/users');
+const messageModel = require('../models/messages');
+
+const moment = require('moment');
 
 function userJoin(id, username, room) {
     
     const user = { id, username, room };
     users.push(user);
+
+    const dbUser = new UserModel({ id, username, room })
+    // dbUser.save()
     return user; 
 }
 
@@ -38,10 +45,29 @@ function getStatus(id) {
    }
 }
 
+function getMessage(msg, user, room){
+    let message = new messageModel({
+        room : room,
+        sender: user,
+        message: msg,
+        status : false,
+        time : moment().format('hh:mm a'),
+        date : moment().format('DD-MM-YYYY')
+    })
+    m = message.save();
+    // console.log(m)
+}
+
+function showMessage(msg){
+    msg = messageModel.find()
+}
+
 module.exports = {
     userJoin,
     getRoomUsers,
     userLeave,
     getCurrentUser,
-    getStatus
+    getStatus,
+    getMessage,
+    showMessage,
 }
